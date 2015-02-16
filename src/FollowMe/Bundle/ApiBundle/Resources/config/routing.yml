@@ -1,0 +1,19 @@
+user:
+    type:     rest
+    resource: FollowMe\Bundle\ApiBundle\Controller\UserController
+
+speaker:
+    type:     rest
+    resource: FollowMe\Bundle\ApiBundle\Controller\SpeakerController
+
+room:
+    type:     rest
+    resource: FollowMe\Bundle\ApiBundle\Controller\RoomController
+
+door:
+    type:     rest
+    resource: FollowMe\Bundle\ApiBundle\Controller\DoorController
+
+synchronisation:
+    type:     rest
+    resource: FollowMe\Bundle\ApiBundle\Controller\DeviceSynchronisationRequestController

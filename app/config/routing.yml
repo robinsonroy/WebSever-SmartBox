@@ -1,0 +1,8 @@
+follow_me_api:
+    resource: "@FollowMeApiBundle/Resources/config/routing.yml"
+    type:     rest
+    prefix:   /api
+
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /api/doc
