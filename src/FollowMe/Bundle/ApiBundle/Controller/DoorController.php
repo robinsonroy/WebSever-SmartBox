@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\DoorType;
 use FollowMe\Bundle\ModelBundle\Entity\Door;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
@@ -42,9 +44,7 @@ class DoorController extends SuperController
         $data = $this->getDoorRepository()->findAll();
 
         return $this->createViewWithData(
-            array(
-                $data
-            ),
+            $data,
             array('list')
         );
     }
@@ -54,6 +54,8 @@ class DoorController extends SuperController
      *
      * @param integer $id
      * @return View
+     *
+     * @Get("/door/{id}")
      *
      * @ApiDoc(
      *  resource=false,
@@ -214,6 +216,8 @@ class DoorController extends SuperController
      *
      * @param integer $id
      * @return View
+     *
+     * @Delete("/door/{id}")
      *
      * @ApiDoc(
      *  resource=true,

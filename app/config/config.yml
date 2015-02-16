@@ -17,7 +17,7 @@ framework:
         engines: ['twig']
         #assets_version: SomeVersionScheme
     default_locale:  "%locale%"
-    trusted_hosts:   [ "127.0.0.1", "localhost.followme.fr" ]
+    trusted_hosts:   ~
     trusted_proxies: ~
     session:
         # handler_id set to null will use default session handler from php.ini

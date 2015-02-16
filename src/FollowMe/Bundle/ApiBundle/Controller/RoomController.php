@@ -51,10 +51,7 @@ class RoomController extends SuperController
         $data = $this->getRoomRepository()->findAll();
 
         return $this->createViewWithData(
-            array(
-                'data' => $data,
-                'count' => count($data),
-            ),
+            $data,
             array('list')
         );
     }

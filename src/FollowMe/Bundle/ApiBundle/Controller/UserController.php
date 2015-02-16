@@ -3,6 +3,8 @@
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
 use FollowMe\Bundle\ModelBundle\Entity\User;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
@@ -39,10 +41,7 @@ class UserController extends SuperController
         $data = $this->getUserRepository()->findAll();
 
         return $this->createViewWithData(
-            array(
-                'data' => $data,
-                'count' => count($data),
-            ),
+            $data,
             array('list')
         );
     }
@@ -51,6 +50,8 @@ class UserController extends SuperController
      * @FosView
      *
      * @return View
+     *
+     * @Get("/user/{id}")
      *
      * @ApiDoc(
      *  resource=false,
@@ -84,7 +85,6 @@ class UserController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param User $user
      * @return View
      *
      * @Put("/user")
@@ -107,7 +107,7 @@ class UserController extends SuperController
      *)
      *
      */
-    public function putUserAction(Request $request, User $user)
+    public function putUserAction(Request $request)
     {
         $data = $this->getUserRepository()->findAll();
 
@@ -126,7 +126,7 @@ class UserController extends SuperController
      * @param User $user
      * @return View
      *
-     * @Post("/user")
+     * @Post("/user/{id}")
      *
      * @ApiDoc(
      *  resource=true,
@@ -163,6 +163,8 @@ class UserController extends SuperController
      *
      * @param integer $id
      * @return View
+     *
+     * @Delete("/user/{id}")
      *
      * @ApiDoc(
      *  resource=true,

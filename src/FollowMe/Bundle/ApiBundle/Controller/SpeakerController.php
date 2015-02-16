@@ -6,6 +6,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\SpeakerType;
 use FollowMe\Bundle\ModelBundle\Entity\Speaker;
+use FOS\RestBundle\Controller\Annotations\Delete;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
@@ -42,10 +44,7 @@ class SpeakerController extends SuperController
         $data = $this->getSpeakerRepository()->findAll();
 
         return $this->createViewWithData(
-            array(
-                'data' => $data,
-                'count' => count($data),
-            ),
+            $data,
             array('list')
         );
     }
@@ -55,6 +54,8 @@ class SpeakerController extends SuperController
      *
      * @param int $id
      * @return View
+     *
+     * @Get("/speaker/{id}")
      *
      * @ApiDoc(
      *  resource=false,
@@ -152,7 +153,7 @@ class SpeakerController extends SuperController
      * @param Speaker $speaker
      * @return View
      *
-     * @Post("/speaker")
+     * @Post("/speaker/{id}")
      *
      * @ApiDoc(
      *  resource=true,
@@ -181,7 +182,6 @@ class SpeakerController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param Speaker $speaker
      * @return View
      *
      * @Put("/speaker")
@@ -204,9 +204,9 @@ class SpeakerController extends SuperController
      *)
      *
      */
-    public function putSpeakerAction(Request $request, Speaker $speaker)
+    public function putSpeakerAction(Request $request)
     {
-        return $this->process($request, $speaker);
+        return $this->process($request);
     }
 
     /**
@@ -214,6 +214,8 @@ class SpeakerController extends SuperController
      *
      * @param integer $id
      * @return View
+     *
+     * @Delete("/speaker/{id}")
      *
      * @ApiDoc(
      *  resource=true,
@@ -307,10 +309,7 @@ class SpeakerController extends SuperController
         $data = $this->getSpeakerRepository()->findAll();
 
         return $this->createViewWithData(
-            array(
-                'data' => $data,
-                'count' => count($data),
-            ),
+            $data,
             array('list')
         );
     }
