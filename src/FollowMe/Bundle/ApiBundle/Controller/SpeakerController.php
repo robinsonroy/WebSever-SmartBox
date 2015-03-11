@@ -5,6 +5,7 @@ namespace FollowMe\Bundle\ApiBundle\Controller;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\SpeakerType;
+use FollowMe\Bundle\ModelBundle\Entity\Room;
 use FollowMe\Bundle\ModelBundle\Entity\Speaker;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -104,53 +105,88 @@ class SpeakerController extends SuperController
      * @param Speaker $speaker
      * @return View
      */
-    protected function process(Request $request, Speaker $speaker = null ){
+    protected function process(Request $request, Speaker $speaker = null){
 
         $success = false;
-
-        // Form
-        /** @var ObjectManager $objectManager */
-        $objectManager = $this->getDoctrine()->getManager();
-        $form = $this->createForm(new SpeakerType($objectManager, array()), $speaker ?: new Speaker());
+        $error_message = null;
 
         // What request is it ?
-        $isCreationRequest = $request->isMethod('POST');
-        $isEditionRequest = $request->isMethod('PUT');
+        $isEditionRequest = $request->isMethod('POST');
+        $isCreationRequest = $request->isMethod('PUT');
 
         if ($isCreationRequest || $isEditionRequest) {
-            $form->handleRequest($request);
 
-            if ($form->isValid()) {
+            // Decode data
+            $raw = json_decode($request->getContent(), true);
 
+            // Validate data
+            if( isset($raw['room']) && isset($raw['name']) )
+            {
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
 
-                // Persist
-                try{
+                // Room exists ?
+                /** @var Room $room */
+                $room = $this->getRoomRepository()->find($raw['room']);
+                if($room) {
 
+                    // Set data
                     if($isCreationRequest) {
-                        $em->persist($speaker);
+                        $speaker = new Speaker();
+                    }
+                    else if(!$speaker) {
+                        $error_message = "Speaker doesn't exists";
                     }
 
-                    $em->flush();
-                    $success = true;
+                    // If valid data
+                    if($speaker)
+                    {
+                        // Update data
+                        $speaker->setRoom($room);
+                        $speaker->setName($raw['name']);
 
-                } catch(\PDOException $e) {
-                    //
+                        try{
+                            // Persist
+                            if($isCreationRequest) {
+                                $em->persist($speaker);
+                            }
+
+                            // Update
+                            $em->flush();
+                            $success = true;
+
+                        } catch(\PDOException $e) {
+                            //
+                        }
+                    }
+
                 }
-
+                // Room doesn't exits
+                else {
+                    $error_message = "Specified room doesn't exists";
+                }
             }
+            // Invalid input
+            else {
+                $error_message = "Input data isn't valid";
+            }
+
+        }
+        // Invalid method
+        else {
+            $error_message = "HTTP Methods isn't valid";
         }
 
-        $statusCode = $success ? 200 : 400;
-        $data = array(
-            'success' => $success,
-        );
+        $statusCode = $success ? SuperController::OK : SuperController::ERROR;
+
         if($success) {
             $data['speaker'] = $speaker;
         }
         else {
-            $data['error'] = "Input data isn't valid";
+            $data = array(
+                'success' => $success,
+                'message' => $error_message
+            );
         }
 
         return $this->createViewWithData(
@@ -301,7 +337,7 @@ class SpeakerController extends SuperController
                     'error' => "Speaker doesn't exists"
                 ),
                 null,
-                400
+                SuperController::ERROR
             );
         }
     }
