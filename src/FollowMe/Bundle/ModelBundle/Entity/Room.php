@@ -24,8 +24,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class Room
 {
     /**
+     * Room's identifier number
+     *
      * @var integer
      *
+     * @Since("0.1")
      * @Groups({"all", "list", "info"})
      *
      * @ORM\Column(name="id", type="integer")
@@ -35,8 +38,11 @@ class Room
     private $id;
 
     /**
+     * Room's name
+     *
      * @var string
      *
+     * @Since("0.1")
      * @Groups({"all", "list", "info"})
      *
      * @ORM\Column(name="name", type="string", length=255)
@@ -46,6 +52,8 @@ class Room
     private $name;
 
     /**
+     * Speakers inside this room
+     *
      * @var \Doctrine\Common\Collections\Collection
      *
      * @Exclude
@@ -55,6 +63,8 @@ class Room
     private $speakers;
 
     /**
+     * Sensors inside this room
+     *
      * @var \Doctrine\Common\Collections\Collection
      *
      * @Exclude

@@ -3,6 +3,7 @@
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
 use FollowMe\Bundle\ModelBundle\Entity\DoorRepository;
+use FollowMe\Bundle\ModelBundle\Entity\RFSensorRepository;
 use FollowMe\Bundle\ModelBundle\Entity\RoomRepository;
 use FollowMe\Bundle\ModelBundle\Entity\SpeakerRepository;
 use FollowMe\Bundle\ModelBundle\Entity\UserRepository;
@@ -44,6 +45,13 @@ class SuperController extends Controller
      */
     public function getDoorRepository(){
         return $this->getDoctrine()->getRepository('FollowMeModelBundle:Door');
+    }
+
+    /**
+     * @return RFSensorRepository
+     */
+    public function getRFSensorRepository() {
+        return $this->getDoctrine()->getRepository('FollowMeModelBundle:RFSensor');
     }
 
     /**

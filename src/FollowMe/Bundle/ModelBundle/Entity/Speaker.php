@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class Speaker
 {
     /**
+     * Speaker's identifier number
+     *
      * @var integer
      *
      * @Since("0.1")
@@ -37,6 +39,8 @@ class Speaker
     private $id;
 
     /**
+     * Speaker's name
+     *
      * @var string
      *
      * @Since("0.1")
@@ -49,6 +53,8 @@ class Speaker
     private $name;
 
     /**
+     * Room in which the speaker is located
+     *
      * @var Room
      *
      * @Since("0.1")

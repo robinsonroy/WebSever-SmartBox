@@ -23,6 +23,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class Door
 {
     /**
+     * Door's identifier number
+     *
      * @var integer
      *
      * @Since("0.1")

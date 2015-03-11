@@ -20,6 +20,8 @@ use JMS\Serializer\Annotation\Since;
 class RFSensor
 {
     /**
+     * Sensor's identifier number
+     *
      * @var integer
      *
      * @Since("0.1")
@@ -31,6 +33,8 @@ class RFSensor
     private $id;
 
     /**
+     * Room in which the sensor is located
+     *
      * @var Room
      *
      * @Since("0.1")
@@ -39,6 +43,16 @@ class RFSensor
      * @ORM\ManyToOne(targetEntity="Room", inversedBy="sensors")
      */
     private $room;
+
+    /**
+     * @param int $id
+     * @return RFSensor
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
      * Get id

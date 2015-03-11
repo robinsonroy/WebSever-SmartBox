@@ -3,9 +3,12 @@
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\DoorType;
 use FollowMe\Bundle\ModelBundle\Entity\Door;
+use FollowMe\Bundle\ModelBundle\Entity\RFSensor;
+use FollowMe\Bundle\ModelBundle\Entity\Room;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -100,64 +103,30 @@ class DoorController extends SuperController
     }
 
     /**
-     * @param Request $request
-     * @param Door $door
-     * @return View
+     * @param array $data
+     * @return bool
      */
-    protected function process(Request $request, Door $door = null ){
+    private function isValidSensorData(array $data) {
+        return (isset($data['id']) && isset($data['room']) && isset($data['room']['id']));
+    }
 
-        $success = false;
+    /**
+     * @param array $data
+     * @return RFSensor|null
+     */
+    private function createSensorWithData(array $data) {
 
-        // Form
-        /** @var ObjectManager $objectManager */
-        $objectManager = $this->getDoctrine()->getManager();
-        $form = $this->createForm(new DoorType($objectManager, array()), $door ?: new Door());
+        // Room exists ?
+        /** @var Room $room */
+        $room = $this->getRoomRepository()->find($data['room']['id']);
+        if(!$room)
+            return null;
 
-        // What request is it ?
-        $isCreationRequest = $request->isMethod('POST');
-        $isEditionRequest = $request->isMethod('PUT');
+        $sensor = new RFSensor();
+        $sensor->setRoom($room);
+        $sensor->setId($data['id']);
 
-        if ($isCreationRequest || $isEditionRequest) {
-            $form->handleRequest($request);
-
-            if ($form->isValid()) {
-
-                /** @var EntityManager $em */
-                $em = $this->getDoctrine()->getManager();
-
-                // Persist
-                try{
-
-                    if($isCreationRequest) {
-                        $em->persist($door);
-                    }
-
-                    $em->flush();
-                    $success = true;
-
-                } catch(\PDOException $e) {
-                    //
-                }
-
-            }
-        }
-
-        $statusCode = $success ? 200 : 400;
-        $data = array(
-            'success' => $success,
-        );
-        if($success) {
-            $data['door'] = $door;
-        }
-        else {
-            $data['error'] = "Input data isn't valid";
-        }
-
-        return $this->createViewWithData(
-            $data,
-            array('info'),
-            $statusCode
-        );
+        return $sensor;
     }
 
     /**
@@ -172,7 +141,6 @@ class DoorController extends SuperController
      *  resource=true,
      *  description="Create a door",
      *  section="Door",
-     *  input="FollowMe\Bundle\ApiBundle\Form\Type\DoorType",
      *  output={
      *      "class"="FollowMe\Bundle\ModelBundle\Entity\Door",
      *      "groups"={"list"}
@@ -189,40 +157,89 @@ class DoorController extends SuperController
      */
     public function putDoorAction(Request $request)
     {
-        return $this->process($request, new Door());
-    }
+        $success = false;
+        $error_message = null;
+        $door = null;
 
-    /**
-     * @FosView
-     *
-     * @param Request $request
-     * @param Door $door
-     * @return View
-     *
-     * @Post("/door/{id}")
-     *
-     * @ApiDoc(
-     *  resource=true,
-     *  description="Update a door",
-     *  section="Door",
-     *  input="FollowMe\Bundle\ApiBundle\Form\Type\DoorType",
-     *  output={
-     *      "class"="FollowMe\Bundle\ModelBundle\Entity\Door",
-     *      "groups"={"info"}
-     *  },
-     *  statusCodes={
-     *      200="Returned when successful",
-     *      400="Returned when the input data isn't valid"
-     *  },
-     *  tags={
-     *      "dev"
-     *  }
-     *)
-     *
-     */
-    public function postDoorAction(Request $request, Door $door)
-    {
-        return $this->process($request, $door);
+        // What request is it ?
+        if ($request->isMethod('PUT')) {
+
+            // Decode data
+            $raw = json_decode($request->getContent(), true);
+
+            // Validate data
+            if( isset($raw['sensor1']) && isset($raw['sensor2']) && $this->isValidSensorData($raw['sensor1']) && $this->isValidSensorData($raw['sensor2']) )
+            {
+                // Set data
+                $door = new Door();
+
+                /** @var EntityManager $em */
+                $em = $this->getDoctrine()->getManager();
+
+                // Create new sensors
+                $sensor1 = $this->createSensorWithData($raw['sensor1']);
+                $sensor2 = $this->createSensorWithData($raw['sensor2']);
+
+                // Valid data ?
+                if($sensor1 && $sensor2)
+                {
+                    // If valid data
+                    if($door)
+                    {
+                        // Update data
+                        $door->setSensor1($sensor1);
+                        $door->setSensor2($sensor2);
+
+                        try{
+                            // Persist
+                            $em->persist($sensor1);
+                            $em->persist($sensor2);
+                            $em->persist($door);
+
+                            // Update
+                            $em->flush();
+                            $success = true;
+
+                        } catch(\PDOException $e) {
+                            $error_message = 'An error occurred';
+                        } catch(DBALException $e) {
+                            $error_message = 'One or both of the sensors might already be associated to another door';
+                        }
+                    }
+                }
+                // Sensors don't exits
+                else {
+                    $error_message = "Specified room doesn't exist";
+                }
+            }
+            // Invalid input
+            else {
+                $error_message = "Input data isn't valid";
+            }
+
+        }
+        // Invalid method
+        else {
+            $error_message = "HTTP Methods isn't valid";
+        }
+
+        $statusCode = $success ? SuperController::OK : SuperController::ERROR;
+
+        if($success) {
+            $data = $door;
+        }
+        else {
+            $data = array(
+                'success' => $success,
+                'message' => $error_message
+            );
+        }
+
+        return $this->createViewWithData(
+            $data,
+            array('info'),
+            $statusCode
+        );
     }
 
     /**
@@ -293,7 +310,7 @@ class DoorController extends SuperController
                         'message' => 'An error occurred'
                     ),
                     null,
-                    500
+                    SuperController::SERVER_ERROR
                 );
             }
         }
@@ -304,7 +321,7 @@ class DoorController extends SuperController
                     'error' => "Door doesn't exists"
                 ),
                 null,
-                400
+                SuperController::ERROR
             );
         }
     }

@@ -207,7 +207,6 @@ class RoomController extends SuperController
      *  resource=true,
      *  description="Create a room",
      *  section="Room",
-     *  input="FollowMe\Bundle\ApiBundle\Form\Type\RoomType",
      *  output={
      *      "class"="FollowMe\Bundle\ModelBundle\Entity\Room",
      *      "groups"={"info"}
@@ -240,7 +239,6 @@ class RoomController extends SuperController
      *  resource=true,
      *  description="Update a room",
      *  section="Room",
-     *  input="FollowMe\Bundle\ApiBundle\Form\Type\RoomType",
      *  output={
      *      "class"="FollowMe\Bundle\ModelBundle\Entity\Room",
      *      "groups"={"list"}
