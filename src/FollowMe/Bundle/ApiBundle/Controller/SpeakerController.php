@@ -247,17 +247,11 @@ class SpeakerController extends SuperController
 
             try {
 
-                // Cannot delete speaker if it's used
+                // Unlink room
                 if($speaker->getRoom())
                 {
-                    return $this->createViewWithData(
-                        array(
-                            'success' => false,
-                            'message' => 'Speaker is currently used, you must delete the associated room'
-                        ),
-                        null,
-                        SuperController::ERROR
-                    );
+                    $speaker->getRoom()->removeSpeaker($speaker);
+                    $speaker->setRoom(null);
                 }
 
                 $em->remove($speaker);

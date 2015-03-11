@@ -248,6 +248,15 @@ class DoorController extends SuperController
             $em = $this->getDoctrine()->getManager();
 
             try {
+                // Unlink sensors
+                $door->getSensor1()->getRoom()->removeSensor($door->getSensor1());
+                $door->getSensor2()->getRoom()->removeSensor($door->getSensor2());
+
+                // Delete sensors
+                $em->remove($door->getSensor1());
+                $em->remove($door->getSensor2());
+
+                // Delete door
                 $em->remove($door);
                 $em->flush();
             }

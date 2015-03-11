@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\RoomType;
 use FollowMe\Bundle\ModelBundle\Entity\Room;
+use FollowMe\Bundle\ModelBundle\Entity\Speaker;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
@@ -15,6 +16,7 @@ use FOS\RestBundle\Controller\Annotations\View as FosView;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializerBuilder;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Proxies\__CG__\FollowMe\Bundle\ModelBundle\Entity\RFSensor;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -269,6 +271,25 @@ class RoomController extends SuperController
             $em = $this->getDoctrine()->getManager();
 
             try {
+
+                // Prevent deletion if there are related sensors
+                if($room->getSensors() || $room->getSensors()->count() > 0) {
+                    return $this->createViewWithData(
+                        array(
+                            'success' => false,
+                            'message' => 'There are related doors, delete the doors first'
+                        ),
+                        null,
+                        SuperController::ERROR
+                    );
+                }
+
+                // Unlink all speakers
+                /** @var Speaker $speaker */
+                foreach($room->getSpeakers() as $speaker) {
+                    $speaker->setRoom(null);
+                }
+
                 $em->remove($room);
                 $em->flush();
             }
@@ -291,7 +312,7 @@ class RoomController extends SuperController
                         'message' => 'An error occurred'
                     ),
                     null,
-                    500
+                    SuperController::SERVER_ERROR
                 );
             }
         }
