@@ -248,13 +248,16 @@ class SpeakerController extends SuperController
             try {
 
                 // Cannot delete speaker if it's used
-                if($this->getSpeakerRepository()->isUnused($speaker))
+                if($speaker->getRoom())
                 {
-                    die('UNUSED OK');
-                }
-                else
-                {
-                    die('UNUSED PAS OK');
+                    return $this->createViewWithData(
+                        array(
+                            'success' => false,
+                            'message' => 'Speaker is currently used, you must delete the associated room'
+                        ),
+                        null,
+                        SuperController::ERROR
+                    );
                 }
 
                 $em->remove($speaker);
@@ -279,7 +282,7 @@ class SpeakerController extends SuperController
                         'message' => 'An error occurred'
                     ),
                     null,
-                    500
+                    SuperController::SERVER_ERROR
                 );
             }
         }

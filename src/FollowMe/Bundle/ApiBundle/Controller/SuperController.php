@@ -16,6 +16,7 @@ class SuperController extends Controller
     const CREATED = 201;
     const ERROR    = 400;
     const UNAUTHORIZED   = 401;
+    const SERVER_ERROR   = 500;
 
     /**
      * @return UserRepository
