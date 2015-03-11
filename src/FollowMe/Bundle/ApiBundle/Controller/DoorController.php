@@ -79,9 +79,23 @@ class DoorController extends SuperController
         /** @var Door $door */
         $door = $this->getDoorRepository()->find($id);
 
+        // If door exists
+        if($door)
+        {
+            return $this->createViewWithData(
+                $door,
+                array('info')
+            );
+        }
+
+        // Door doesn't exists
         return $this->createViewWithData(
-            $door,
-            array('info')
+            array(
+                'success' => false,
+                'message' => "Door doesn't exists"
+            ),
+            null,
+            SuperController::ERROR
         );
     }
 

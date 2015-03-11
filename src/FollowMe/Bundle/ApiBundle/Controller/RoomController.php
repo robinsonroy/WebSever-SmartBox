@@ -88,9 +88,23 @@ class RoomController extends SuperController
         /** @var Room $room $room */
         $room = $this->getRoomRepository()->find($id);
 
+        // If the room exists
+        if($room)
+        {
+            return $this->createViewWithData(
+                $room,
+                array('info')
+            );
+        }
+
+        // Room doesn't exists
         return $this->createViewWithData(
-            $room,
-            array('info')
+            array(
+                'success' => false,
+                'message' => "Room doesn't exists"
+            ),
+            null,
+            SuperController::ERROR
         );
     }
 

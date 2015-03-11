@@ -79,9 +79,23 @@ class SpeakerController extends SuperController
         /** @var Speaker $speaker */
         $speaker = $this->getSpeakerRepository()->find($id);
 
+        // If speaker exists
+        if($speaker)
+        {
+            return $this->createViewWithData(
+                $speaker,
+                array('info')
+            );
+        }
+
+        // Speaker doesn't exists
         return $this->createViewWithData(
-            $speaker,
-            array('info')
+            array(
+                'success' => false,
+                'message' => "Speaker doesn't exists"
+            ),
+            null,
+            SuperController::ERROR
         );
     }
 
