@@ -246,6 +246,17 @@ class SpeakerController extends SuperController
             $em = $this->getDoctrine()->getManager();
 
             try {
+
+                // Cannot delete speaker if it's used
+                if($this->getSpeakerRepository()->isUnused($speaker))
+                {
+                    die('UNUSED OK');
+                }
+                else
+                {
+                    die('UNUSED PAS OK');
+                }
+
                 $em->remove($speaker);
                 $em->flush();
             }

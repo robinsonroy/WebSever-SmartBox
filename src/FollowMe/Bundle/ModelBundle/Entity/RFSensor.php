@@ -3,10 +3,9 @@
 namespace FollowMe\Bundle\ModelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\AccessType;
 use JMS\Serializer\Annotation\ExclusionPolicy;
-use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\Groups;
-use JMS\Serializer\Annotation\VirtualProperty;
 use JMS\Serializer\Annotation\Since;
 
 /**
@@ -16,6 +15,7 @@ use JMS\Serializer\Annotation\Since;
  * @ORM\Entity(repositoryClass="FollowMe\Bundle\ModelBundle\Entity\RFSensorRepository")
  *
  * @ExclusionPolicy("NONE")
+ * @AccessType("public_methods")
  */
 class RFSensor
 {
@@ -33,7 +33,8 @@ class RFSensor
     /**
      * @var Room
      *
-     * @Exclude
+     * @Since("0.1")
+     * @Groups({"all", "list", "info"})
      *
      * @ORM\ManyToOne(targetEntity="Room", inversedBy="sensors")
      */

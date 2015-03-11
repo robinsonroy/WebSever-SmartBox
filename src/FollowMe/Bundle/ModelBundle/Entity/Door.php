@@ -3,6 +3,7 @@
 namespace FollowMe\Bundle\ModelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\AccessType;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\Groups;
@@ -17,6 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @ORM\Entity(repositoryClass="FollowMe\Bundle\ModelBundle\Entity\DoorRepository")
  *
  * @ExclusionPolicy("NONE")
+ * @AccessType("public_methods")
  */
 class Door
 {
@@ -38,7 +40,7 @@ class Door
      * @var RFSensor
      *
      * @Since("0.1")
-     * @Groups({"all", "info"})
+     * @Groups({"all", "list", "info"})
      *
      * @NotBlank()
      *
@@ -52,7 +54,7 @@ class Door
      * @var RFSensor
      *
      * @Since("0.1")
-     * @Groups({"all", "info"})
+     * @Groups({"all", "list", "info"})
      *
      * @NotBlank()
      *

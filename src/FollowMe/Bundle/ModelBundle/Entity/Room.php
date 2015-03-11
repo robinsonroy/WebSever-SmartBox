@@ -6,7 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Expose;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\Since;
 use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -70,8 +73,9 @@ class Room
     /**
      * Return sensors count (used for serialization)
      *
-     * @VirtualProperty
+     * @Since("0.1")
      * @Groups({"all", "info"})
+     * @VirtualProperty()
      *
      * @return integer
      */
@@ -83,8 +87,9 @@ class Room
     /**
      * Return speakers count (used for serialization)
      *
-     * @VirtualProperty
+     * @Since("0.1")
      * @Groups({"all", "info"})
+     * @VirtualProperty()
      *
      * @return integer
      */

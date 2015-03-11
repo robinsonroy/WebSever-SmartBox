@@ -2,6 +2,7 @@
 
 namespace FollowMe\Bundle\ModelBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
 
 /**
@@ -12,4 +13,28 @@ use Doctrine\ORM\EntityRepository;
  */
 class SpeakerRepository extends EntityRepository
 {
+    /**
+     * @param Speaker $speaker
+     * @return bool
+     */
+    public function isUnused(Speaker $speaker)
+    {
+        /** @var DoorRepository $doorRepository */
+        $doorRepository = $this->getEntityManager()->getRepository('FollowMeModelBundle:Door');
+
+        $doorRepository->findBy([]);
+
+        /** @var QueryBuilder $qb */
+        $results = $this->getEntityManager()->createQuery(
+            'SELECT s FROM FollowMeModelBundle:Speaker s WHERE s NOT IN (
+                SELECT d1.sensor1 FROM FollowMeModelBundle:Door d1
+            )'
+        )->getResult();
+
+
+        var_dump($results);
+        die();
+
+        return true;
+    }
 }

@@ -3,9 +3,11 @@
 namespace FollowMe\Bundle\ModelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\AccessType;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Exclude;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
 use JMS\Serializer\Annotation\VirtualProperty;
 use JMS\Serializer\Annotation\Since;
 use JMS\Serializer\Annotation\SerializedName;
@@ -18,6 +20,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  * @ORM\Entity(repositoryClass="FollowMe\Bundle\ModelBundle\Entity\SpeakerRepository")
  *
  * @ExclusionPolicy("NONE")
+ * @AccessType("public_methods")
  */
 class Speaker
 {
@@ -48,24 +51,12 @@ class Speaker
     /**
      * @var Room
      *
-     * @Exclude
+     * @Since("0.1")
+     * @Groups({"all", "list", "info"})
      *
      * @ORM\ManyToOne(targetEntity="Room", inversedBy="speakers")
      */
     private $room;
-
-    /**
-     * Return room's identifier (used for serialization)
-     *
-     * @Since("0.1")
-     * @Groups({"all", "list"})
-     *
-     * @return integer
-     */
-    public function getRoomId()
-    {
-        return $this->getRoom()->getId();
-    }
 
     /**
      * Get id

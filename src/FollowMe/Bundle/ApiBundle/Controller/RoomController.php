@@ -99,21 +99,6 @@ class RoomController extends SuperController
      */
     protected function process(Request $request, Room $room = null ){
 
-/*
-        $serializer = $this->get('jms_serializer');
-
-        $data = <<<EOF
-        {
-            "id":0,
-            "name":"Salon"
-        }
-EOF;
-
-        $room = $serializer->deserialize($data, "FollowMe\\Bundle\\ModelBundle\\Entity\\Room", 'json');
-        var_dump($room);
-        die();
-        */
-
         $success = false;
 
         // Form
