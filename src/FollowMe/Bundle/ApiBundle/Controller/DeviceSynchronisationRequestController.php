@@ -2,16 +2,10 @@
 
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\DoorType;
-use FollowMe\Bundle\ModelBundle\Entity\Door;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\View\View;
-use Symfony\Component\HttpFoundation\Request;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 class DeviceSynchronisationRequestController extends SuperController
 {

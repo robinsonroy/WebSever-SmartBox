@@ -2,20 +2,17 @@
 
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use FollowMe\Bundle\ApiBundle\Form\Type\DoorType;
 use FollowMe\Bundle\ModelBundle\Entity\Door;
 use FollowMe\Bundle\ModelBundle\Entity\RFSensor;
 use FollowMe\Bundle\ModelBundle\Entity\Room;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Component\HttpFoundation\Request;
 
 class DoorController extends SuperController

@@ -2,7 +2,6 @@
 
 namespace FollowMe\Bundle\ModelBundle\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
 
 /**

@@ -2,7 +2,6 @@
 
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\Form\Type\SpeakerType;
 use FollowMe\Bundle\ModelBundle\Entity\Room;
