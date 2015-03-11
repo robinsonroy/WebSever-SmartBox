@@ -102,13 +102,14 @@ class SpeakerController extends SuperController
 
     /**
      * @param Request $request
-     * @param Speaker $speaker
+     * @param integer|null $id
      * @return View
      */
-    protected function process(Request $request, Speaker $speaker = null){
+    protected function process(Request $request, $id = null){
 
         $success = false;
         $error_message = null;
+        $speaker = null;
 
         // What request is it ?
         $isEditionRequest = $request->isMethod('POST');
@@ -134,8 +135,10 @@ class SpeakerController extends SuperController
                     if($isCreationRequest) {
                         $speaker = new Speaker();
                     }
-                    else if(!$speaker) {
-                        $error_message = "Speaker doesn't exists";
+                    else if($id) {
+                        $speaker = $this->getSpeakerRepository()->find($id);
+                        if(!$speaker)
+                            $error_message = "Speaker doesn't exists";
                     }
 
                     // If valid data
@@ -180,7 +183,7 @@ class SpeakerController extends SuperController
         $statusCode = $success ? SuperController::OK : SuperController::ERROR;
 
         if($success) {
-            $data['speaker'] = $speaker;
+            $data = $speaker;
         }
         else {
             $data = array(
@@ -200,7 +203,7 @@ class SpeakerController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param Speaker $speaker
+     * @param integer $id
      * @return View
      *
      * @Post("/speaker/{id}")
@@ -223,9 +226,9 @@ class SpeakerController extends SuperController
      *)
      *
      */
-    public function postSpeakerAction(Request $request, Speaker $speaker)
+    public function postSpeakerAction(Request $request, $id)
     {
-        return $this->process($request, $speaker);
+        return $this->process($request, $id);
     }
 
     /**

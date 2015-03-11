@@ -110,69 +110,82 @@ class RoomController extends SuperController
 
     /**
      * @param Request $request
-     * @param Room $room
+     * @param integer|null $id
      * @return View
      */
-    protected function process(Request $request, Room $room = null ){
+    protected function process(Request $request, $id = null ){
 
         $success = false;
-
-        // Form
-        /** @var ObjectManager $objectManager */
-        $objectManager = $this->getDoctrine()->getManager();
-
-        if($room == null)
-            $room = new Room();
-
-        $form = $this->createForm(new RoomType($objectManager, array()), $room);
+        $error_message = null;
+        $room = null;
 
         // What request is it ?
-        $isCreationRequest = $request->isMethod('POST');
-        $isEditionRequest = $request->isMethod('PUT');
+        $isEditionRequest = $request->isMethod('POST');
+        $isCreationRequest = $request->isMethod('PUT');
 
         if ($isCreationRequest || $isEditionRequest) {
-            $form->submit($request->get($form->getName()), true);
 
-            if ($form->isValid()) {
+            // Decode data
+            $raw = json_decode($request->getContent(), true);
 
+            // Validate data
+            if( isset($raw['name']) )
+            {
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
 
-                // Persist
-                try{
-
-                    if($isCreationRequest) {
-                        $em->persist($room);
-                    }
-
-                    $em->flush();
-                    $success = true;
-
-                } catch(\PDOException $e) {
-                    //
+                // Set data
+                if($isCreationRequest) {
+                    $room = new Room();
+                }
+                else if($id) {
+                    $room = $this->getRoomRepository()->find($id);
+                    if(!$room)
+                        $error_message = "Room doesn't exists";
                 }
 
+                // If valid data
+                if($room)
+                {
+                    // Update data
+                    $room->setName($raw['name']);
+
+                    try{
+                        // Persist
+                        if($isCreationRequest) {
+                            $em->persist($room);
+                        }
+
+                        // Update
+                        $em->flush();
+                        $success = true;
+
+                    } catch(\PDOException $e) {
+                        //
+                    }
+                }
             }
+            // Invalid input
             else {
-                var_dump($form->isSubmitted());
-                var_dump($form->isSynchronized());
-                var_dump($form->isEmpty());
-                var_dump($form->isRequired());
-                var_dump($request->getContent());
-                var_dump($form->getErrors()->count());
-                var_dump($room);
+                $error_message = "Input data isn't valid";
             }
+
+        }
+        // Invalid method
+        else {
+            $error_message = "HTTP Methods isn't valid";
         }
 
-        $statusCode = $success ? 200 : 400;
-        $data = array(
-            'success' => $success,
-        );
+        $statusCode = $success ? SuperController::OK : SuperController::ERROR;
+
         if($success) {
-            $data['room'] = $room;
+            $data = $room;
         }
         else {
-            $data['error'] = "Input data isn't valid";
+            $data = array(
+                'success' => $success,
+                'message' => $error_message
+            );
         }
 
         return $this->createViewWithData(
@@ -218,7 +231,7 @@ class RoomController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param Room $room
+     * @param integer $id
      * @return View
      *
      * @Post("/room/{id}")
@@ -242,9 +255,9 @@ class RoomController extends SuperController
      *)
      *
      */
-    public function postRoomAction(Request $request, Room $room)
+    public function postRoomAction(Request $request, $id)
     {
-        return $this->process($request, $room);
+        return $this->process($request, $id);
     }
 
     /**
