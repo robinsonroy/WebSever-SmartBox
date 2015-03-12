@@ -51,7 +51,7 @@ class MusicController extends SuperController
      * @Get("/music/{id}")
      *
      * @ApiDoc(
-     *  resource=false,
+     *  resource=true,
      *  description="Return music's information",
      *  section="Music",
      *  output={
