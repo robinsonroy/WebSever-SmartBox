@@ -3,7 +3,6 @@
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
-use FollowMe\Bundle\ApiBundle\Form\Type\RoomType;
 use FollowMe\Bundle\ModelBundle\Entity\Room;
 use FollowMe\Bundle\ModelBundle\Entity\Speaker;
 use FOS\RestBundle\Controller\Annotations\Delete;
@@ -13,7 +12,6 @@ use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Proxies\__CG__\FollowMe\Bundle\ModelBundle\Entity\RFSensor;
 use Symfony\Component\HttpFoundation\Request;
 
 class RoomController extends SuperController
@@ -89,11 +87,11 @@ class RoomController extends SuperController
             );
         }
 
-        // Room doesn't exists
+        // Room doesn't exist
         return $this->createViewWithData(
             array(
                 'success' => false,
-                'message' => "Room doesn't exists"
+                'message' => "Room doesn't exist"
             ),
             null,
             SuperController::ERROR
@@ -133,7 +131,7 @@ class RoomController extends SuperController
                 else if($id) {
                     $room = $this->getRoomRepository()->find($id);
                     if(!$room)
-                        $error_message = "Room doesn't exists";
+                        $error_message = "Room doesn't exist";
                 }
 
                 // If valid data
@@ -290,7 +288,7 @@ class RoomController extends SuperController
             try {
 
                 // Prevent deletion if there are related sensors
-                if($room->getSensors() || $room->getSensors()->count() > 0) {
+                if($room->getSensors() && $room->getSensors()->count() > 0) {
                     return $this->createViewWithData(
                         array(
                             'success' => false,
@@ -340,7 +338,7 @@ class RoomController extends SuperController
                     'error' => "Room doesn't exists"
                 ),
                 null,
-                400
+                SuperController::ERROR
             );
         }
 

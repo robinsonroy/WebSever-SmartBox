@@ -26,6 +26,7 @@ class User
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
 
@@ -47,7 +48,7 @@ class User
      * @Since("0.1")
      * @Groups({"all", "list", "info"})
      *
-     * @ORM\Column(name="braceletId", type="integer")
+     * @ORM\Column(name="braceletId", type="integer", unique=true)
      *
      * @NotBlank()
      */

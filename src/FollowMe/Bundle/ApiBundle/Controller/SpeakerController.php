@@ -88,11 +88,11 @@ class SpeakerController extends SuperController
             );
         }
 
-        // Speaker doesn't exists
+        // Speaker doesn't exist
         return $this->createViewWithData(
             array(
                 'success' => false,
-                'message' => "Speaker doesn't exists"
+                'message' => "Speaker doesn't exist"
             ),
             null,
             SuperController::ERROR
@@ -165,7 +165,7 @@ class SpeakerController extends SuperController
                 }
                 // Room doesn't exits
                 else {
-                    $error_message = "Specified room doesn't exists";
+                    $error_message = "Specified room doesn't exist";
                 }
             }
             // Invalid input
@@ -336,7 +336,7 @@ class SpeakerController extends SuperController
             return $this->createViewWithData(
                 array(
                     'success' => false,
-                    'error' => "Speaker doesn't exists"
+                    'error' => "Speaker doesn't exist"
                 ),
                 null,
                 SuperController::ERROR

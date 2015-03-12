@@ -88,11 +88,11 @@ class DoorController extends SuperController
             );
         }
 
-        // Door doesn't exists
+        // Door doesn't exist
         return $this->createViewWithData(
             array(
                 'success' => false,
-                'message' => "Door doesn't exists"
+                'message' => "Door doesn't exist"
             ),
             null,
             SuperController::ERROR
@@ -317,7 +317,7 @@ class DoorController extends SuperController
             return $this->createViewWithData(
                 array(
                     'success' => false,
-                    'error' => "Door doesn't exists"
+                    'error' => "Door doesn't exist"
                 ),
                 null,
                 SuperController::ERROR

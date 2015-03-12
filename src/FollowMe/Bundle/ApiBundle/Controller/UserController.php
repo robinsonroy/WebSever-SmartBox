@@ -2,6 +2,7 @@
 
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ModelBundle\Entity\User;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -10,7 +11,7 @@ use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends SuperController
 {
@@ -49,6 +50,7 @@ class UserController extends SuperController
     /**
      * @FosView
      *
+     * @param integer $id
      * @return View
      *
      * @Get("/user/{id}")
@@ -75,9 +77,112 @@ class UserController extends SuperController
         /** @var User $user */
         $user = $this->getUserRepository()->find($id);
 
+        // If user exists
+        if($user)
+        {
+            return $this->createViewWithData(
+                $user,
+                array('info')
+            );
+        }
+
+        // User doesn't exist
         return $this->createViewWithData(
-            $user,
-            array('info')
+            array(
+                'success' => false,
+                'message' => "User doesn't exist"
+            ),
+            null,
+            SuperController::ERROR
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @param integer|null $id
+     * @return View
+     */
+    protected function process(Request $request, $id = null){
+
+        $success = false;
+        $error_message = null;
+        $user = null;
+
+        // What request is it ?
+        $isEditionRequest = $request->isMethod('POST');
+        $isCreationRequest = $request->isMethod('PUT');
+
+        if ($isCreationRequest || $isEditionRequest) {
+
+            // Decode data
+            $raw = json_decode($request->getContent(), true);
+
+            // Validate data
+            if( isset($raw['name']) && ( $isCreationRequest && isset($raw['bracelet_id']) ) )
+            {
+                /** @var EntityManager $em */
+                $em = $this->getDoctrine()->getManager();
+
+                // Set data
+                if($isCreationRequest) {
+                    $user = new User();
+                }
+                else if($id) {
+                    $user = $this->getUserRepository()->find($id);
+                    if(!$user)
+                        $error_message = "User doesn't exist";
+                }
+
+                // If valid data
+                if($user)
+                {
+                    // Update data
+                    $user->setName($raw['name']);
+                    if($isCreationRequest)
+                        $user->setBraceletId($raw['bracelet_id']);
+
+                    try{
+                        // Persist
+                        if($isCreationRequest) {
+                            $em->persist($user);
+                        }
+
+                        // Update
+                        $em->flush();
+                        $success = true;
+
+                    } catch(\PDOException $e) {
+                        //
+                    }
+                }
+            }
+            // Invalid input
+            else {
+                $error_message = "Input data isn't valid";
+            }
+
+        }
+        // Invalid method
+        else {
+            $error_message = "HTTP Methods isn't valid";
+        }
+
+        $statusCode = $success ? SuperController::OK : SuperController::ERROR;
+
+        if($success) {
+            $data = $user;
+        }
+        else {
+            $data = array(
+                'success' => $success,
+                'message' => $error_message
+            );
+        }
+
+        return $this->createViewWithData(
+            $data,
+            array('info'),
+            $statusCode
         );
     }
 
@@ -109,21 +214,14 @@ class UserController extends SuperController
      */
     public function putUserAction(Request $request)
     {
-        $data = $this->getUserRepository()->findAll();
-
-        return $this->createViewWithData(
-            array(
-
-            ),
-            array('list')
-        );
+        return $this->process($request);
     }
 
     /**
      * @FosView
      *
      * @param Request $request
-     * @param User $user
+     * @param integer $id
      * @return View
      *
      * @Post("/user/{id}")
@@ -146,16 +244,9 @@ class UserController extends SuperController
      *)
      *
      */
-    public function postUserAction(Request $request, User $user)
+    public function postUserAction(Request $request, $id)
     {
-        $data = $this->getUserRepository()->findAll();
-
-        return $this->createViewWithData(
-            array(
-
-            ),
-            array('info')
-        );
+        return $this->process($request, $id);
     }
 
     /**
@@ -185,15 +276,53 @@ class UserController extends SuperController
      */
     public function deleteUserAction($id)
     {
-        /** @var User $user */
+        /** @var User $door */
         $user = $this->getUserRepository()->find($id);
 
-        return $this->createViewWithData(
-            array(
+        if($user) {
 
-            ),
-            array('list')
-        );
+            $success = true;
+            /** @var EntityManager $em */
+            $em = $this->getDoctrine()->getManager();
+
+            try {
+                // Delete user
+                $em->remove($user);
+                $em->flush();
+            }
+            catch(\PDOException $e) {
+                $success = false;
+            }
+
+            if($success) {
+                return $this->createViewWithData(
+                    array(
+                        'success' => true,
+                        'message' => 'User deleted'
+                    )
+                );
+            }
+            else {
+                return $this->createViewWithData(
+                    array(
+                        'success' => false,
+                        'message' => 'An error occurred'
+                    ),
+                    null,
+                    SuperController::SERVER_ERROR
+                );
+            }
+        }
+        else {
+            return $this->createViewWithData(
+                array(
+                    'success' => false,
+                    'error' => "User doesn't exist"
+                ),
+                null,
+                SuperController::ERROR
+            );
+        }
     }
 
     /**
