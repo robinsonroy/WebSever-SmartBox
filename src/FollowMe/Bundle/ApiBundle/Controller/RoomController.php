@@ -100,10 +100,9 @@ class RoomController extends SuperController
 
     /**
      * @param Request $request
-     * @param integer|null $id
      * @return View
      */
-    protected function process(Request $request, $id = null ){
+    protected function process(Request $request){
 
         $success = false;
         $error_message = null;
@@ -119,7 +118,7 @@ class RoomController extends SuperController
             $raw = json_decode($request->getContent(), true);
 
             // Validate data
-            if( isset($raw['name']) )
+            if( isset($raw['name']) && ( $isCreationRequest ||  ($isEditionRequest && isset($raw['id'])) ) )
             {
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
@@ -128,8 +127,8 @@ class RoomController extends SuperController
                 if($isCreationRequest) {
                     $room = new Room();
                 }
-                else if($id) {
-                    $room = $this->getRoomRepository()->find($id);
+                else {
+                    $room = $this->getRoomRepository()->find($raw['id']);
                     if(!$room)
                         $error_message = "Room doesn't exist";
                 }
@@ -220,10 +219,9 @@ class RoomController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param integer $id
      * @return View
      *
-     * @Post("/room/{id}")
+     * @Post("/room")
      *
      * @ApiDoc(
      *  resource=true,
@@ -243,9 +241,9 @@ class RoomController extends SuperController
      *)
      *
      */
-    public function postRoomAction(Request $request, $id)
+    public function postRoomAction(Request $request)
     {
-        return $this->process($request, $id);
+        return $this->process($request);
     }
 
     /**

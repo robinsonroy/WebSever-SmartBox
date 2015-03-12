@@ -101,10 +101,9 @@ class SpeakerController extends SuperController
 
     /**
      * @param Request $request
-     * @param integer|null $id
      * @return View
      */
-    protected function process(Request $request, $id = null){
+    protected function process(Request $request){
 
         $success = false;
         $error_message = null;
@@ -120,7 +119,7 @@ class SpeakerController extends SuperController
             $raw = json_decode($request->getContent(), true);
 
             // Validate data
-            if( isset($raw['room']) && isset($raw['name']) )
+            if( isset($raw['room']) && isset($raw['name']) && ($isEditionRequest && isset($raw['id'])) )
             {
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
@@ -134,10 +133,10 @@ class SpeakerController extends SuperController
                     if($isCreationRequest) {
                         $speaker = new Speaker();
                     }
-                    else if($id) {
-                        $speaker = $this->getSpeakerRepository()->find($id);
+                    else {
+                        $speaker = $this->getSpeakerRepository()->find($raw['id']);
                         if(!$speaker)
-                            $error_message = "Speaker doesn't exists";
+                            $error_message = "Speaker doesn't exist";
                     }
 
                     // If valid data
@@ -202,10 +201,9 @@ class SpeakerController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param integer $id
      * @return View
      *
-     * @Post("/speaker/{id}")
+     * @Post("/speaker")
      *
      * @ApiDoc(
      *  resource=true,
@@ -225,9 +223,9 @@ class SpeakerController extends SuperController
      *)
      *
      */
-    public function postSpeakerAction(Request $request, $id)
+    public function postSpeakerAction(Request $request)
     {
-        return $this->process($request, $id);
+        return $this->process($request);
     }
 
     /**

@@ -99,10 +99,9 @@ class UserController extends SuperController
 
     /**
      * @param Request $request
-     * @param integer|null $id
      * @return View
      */
-    protected function process(Request $request, $id = null){
+    protected function process(Request $request){
 
         $success = false;
         $error_message = null;
@@ -118,7 +117,7 @@ class UserController extends SuperController
             $raw = json_decode($request->getContent(), true);
 
             // Validate data
-            if( isset($raw['name']) && ( $isCreationRequest && isset($raw['bracelet_id']) ) )
+            if( isset($raw['name']) && (  ($isCreationRequest && isset($raw['bracelet_id'])) || ($isEditionRequest && isset($raw['id'])) ) )
             {
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
@@ -127,8 +126,8 @@ class UserController extends SuperController
                 if($isCreationRequest) {
                     $user = new User();
                 }
-                else if($id) {
-                    $user = $this->getUserRepository()->find($id);
+                else {
+                    $user = $this->getUserRepository()->find($raw['id']);
                     if(!$user)
                         $error_message = "User doesn't exist";
                 }
@@ -221,10 +220,9 @@ class UserController extends SuperController
      * @FosView
      *
      * @param Request $request
-     * @param integer $id
      * @return View
      *
-     * @Post("/user/{id}")
+     * @Post("/user")
      *
      * @ApiDoc(
      *  resource=true,
@@ -244,9 +242,9 @@ class UserController extends SuperController
      *)
      *
      */
-    public function postUserAction(Request $request, $id)
+    public function postUserAction(Request $request)
     {
-        return $this->process($request, $id);
+        return $this->process($request);
     }
 
     /**
