@@ -17,3 +17,7 @@ door:
 synchronisation:
     type:     rest
     resource: FollowMe\Bundle\ApiBundle\Controller\DeviceSynchronisationRequestController
+
+music:
+    type:     rest
+    resource: FollowMe\Bundle\ApiBundle\Controller\MusicController
