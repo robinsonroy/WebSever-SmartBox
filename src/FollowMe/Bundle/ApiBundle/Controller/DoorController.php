@@ -154,6 +154,8 @@ class DoorController extends SuperController
      */
     public function putDoorAction(Request $request)
     {
+        //TODO: Don't create new sensor, link to non sync sensors
+
         $success = false;
         $error_message = null;
         $door = null;
