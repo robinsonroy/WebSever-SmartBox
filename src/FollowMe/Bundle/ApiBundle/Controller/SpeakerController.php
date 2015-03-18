@@ -2,8 +2,8 @@
 
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use FollowMe\Bundle\ApiBundle\Form\Type\SpeakerType;
 use FollowMe\Bundle\ModelBundle\Entity\Room;
 use FollowMe\Bundle\ModelBundle\Entity\Speaker;
 use FOS\RestBundle\Controller\Annotations\Delete;
@@ -17,6 +17,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SpeakerController extends SuperController
 {
+    private static $IP_ADDRESS_PATTERN = "$(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+
+    private function isValidIPAddress($ipAddress) {
+        return preg_match(self::$IP_ADDRESS_PATTERN, $ipAddress);
+    }
+
     /**
      * @FosView
      *
@@ -119,14 +125,14 @@ class SpeakerController extends SuperController
             $raw = json_decode($request->getContent(), true);
 
             // Validate data
-            if( isset($raw['room']) && isset($raw['name']) && ($isEditionRequest && isset($raw['id'])) )
+            if( (isset($raw['room']) && is_array($raw['room']) && isset($raw['room']['id'])) && isset($raw['name']) && isset($raw['ip_address']) && ($isCreationRequest || ($isEditionRequest && isset($raw['id'])) ) )
             {
                 /** @var EntityManager $em */
                 $em = $this->getDoctrine()->getManager();
 
                 // Room exists ?
                 /** @var Room $room */
-                $room = $this->getRoomRepository()->find($raw['room']);
+                $room = $this->getRoomRepository()->find($raw['room']['id']);
                 if($room) {
 
                     // Set data
@@ -139,12 +145,17 @@ class SpeakerController extends SuperController
                             $error_message = "Speaker doesn't exist";
                     }
 
+                    // Verify ip address
+                    if(!$this->isValidIPAddress($raw['ip_address'])) {
+                        $error_message = "IP address isn't valid";
+                    }
                     // If valid data
-                    if($speaker)
+                    else if($speaker)
                     {
                         // Update data
                         $speaker->setRoom($room);
                         $speaker->setName($raw['name']);
+                        $speaker->setIpAddress($raw['ip_address']);
 
                         try{
                             // Persist
@@ -156,8 +167,12 @@ class SpeakerController extends SuperController
                             $em->flush();
                             $success = true;
 
-                        } catch(\PDOException $e) {
-                            //
+                        }
+                        catch(\PDOException $e) {
+                            $error_message = 'An error occurred - Code 1';
+                        }
+                        catch(DBALException $e) {
+                            $error_message = 'An error occurred - Code 2';
                         }
                     }
 

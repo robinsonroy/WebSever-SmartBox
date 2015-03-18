@@ -61,6 +61,18 @@ class Speaker
     private $room;
 
     /**
+     * IP address of the speaker
+     *
+     * @var String
+     *
+     * @Since("0.1")
+     * @Groups({"all", "list", "info"})
+     *
+     * @ORM\Column(name="ip_address", type="string", length=255)
+     */
+    private $ipAddress;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -103,6 +115,24 @@ class Speaker
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return String
+     */
+    public function getIpAddress()
+    {
+        return $this->ipAddress;
+    }
+
+    /**
+     * @param String $ipAddress
+     * @return Speaker
+     */
+    public function setIpAddress($ipAddress)
+    {
+        $this->ipAddress = $ipAddress;
         return $this;
     }
 
