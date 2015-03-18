@@ -83,6 +83,16 @@ class User
     private $locations;
 
     /**
+     * @var Music
+     *
+     * @Since("0.1")
+     * @Groups({"all"})
+     *
+     * @ORM\OneToOne(targetEntity="Music")
+     */
+    private $currentlyPlayedMusic;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -207,5 +217,23 @@ class User
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return Music
+     */
+    public function getCurrentlyPlayedMusic()
+    {
+        return $this->currentlyPlayedMusic;
+    }
+
+    /**
+     * @param Music $currentlyPlayedMusic
+     * @return User
+     */
+    public function setCurrentlyPlayedMusic($currentlyPlayedMusic)
+    {
+        $this->currentlyPlayedMusic = $currentlyPlayedMusic;
+        return $this;
     }
 }
