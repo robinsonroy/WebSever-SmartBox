@@ -93,6 +93,16 @@ class User
     private $currentlyPlayedMusic;
 
     /**
+     * @var boolean
+     *
+     * @Since("0.1")
+     * @Groups({"all"})
+     *
+     * @ORM\Column(name="is_playing_music", type="boolean")
+     */
+    private $isPlayingMusic;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -235,5 +245,21 @@ class User
     {
         $this->currentlyPlayedMusic = $currentlyPlayedMusic;
         return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIsPlayingMusic()
+    {
+        return $this->isPlayingMusic;
+    }
+
+    /**
+     * @param boolean $isPlayingMusic
+     */
+    public function setIsPlayingMusic($isPlayingMusic)
+    {
+        $this->isPlayingMusic = $isPlayingMusic;
     }
 }

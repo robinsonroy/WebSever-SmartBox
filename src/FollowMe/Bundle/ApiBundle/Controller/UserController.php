@@ -154,13 +154,12 @@ class UserController extends SuperController
                         // Update
                         $em->flush();
                         $success = true;
-
                     }
                     catch(\PDOException $e) {
-                        $error_message = 'An error occurred';
+                        $error_message = 'An error occurred - Code 1';
                     }
                     catch(DBALException $e) {
-                        $error_message = 'An error occurred';
+                        $error_message = 'An error occurred - Code 2';
                     }
                 }
             }
