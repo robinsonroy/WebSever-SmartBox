@@ -27,7 +27,7 @@ class User
      * @Since("0.1")
      * @Groups({"all", "list", "info"})
      *
-     * @ORM\Column(name="id", type="integer")
+     * @ORM\Column(name="id", type="integer", unique=true)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */

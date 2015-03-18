@@ -2,6 +2,7 @@
 
 namespace FollowMe\Bundle\ApiBundle\Controller;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ModelBundle\Entity\User;
 use FOS\RestBundle\Controller\Annotations\Delete;
@@ -132,8 +133,12 @@ class UserController extends SuperController
                         $error_message = "User doesn't exist";
                 }
 
+                // Name already used ?
+                if($this->getUserRepository()->nameAlreadyUsed($raw['name'])) {
+                    $error_message = "Name already used";
+                }
                 // If valid data
-                if($user)
+                else if($user)
                 {
                     // Update data
                     $user->setName($raw['name']);
@@ -150,8 +155,12 @@ class UserController extends SuperController
                         $em->flush();
                         $success = true;
 
-                    } catch(\PDOException $e) {
-                        //
+                    }
+                    catch(\PDOException $e) {
+                        $error_message = 'An error occurred';
+                    }
+                    catch(DBALException $e) {
+                        $error_message = 'An error occurred';
                     }
                 }
             }

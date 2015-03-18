@@ -12,4 +12,17 @@ use Doctrine\ORM\EntityRepository;
  */
 class UserRepository extends EntityRepository
 {
+
+    /**
+     * @param $name
+     * @return boolean TRUE if the name is already used, FALSE otherwise
+     */
+    public function nameAlreadyUsed($name) {
+        $result = $this->findOneBy(array(
+            'name' => $name
+        ));
+
+        return ($result != null);
+    }
+
 }
