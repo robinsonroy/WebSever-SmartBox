@@ -71,11 +71,23 @@ class Room
      */
     private $sensors;
 
+    /**
+     * Users inside this room
+     *
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @Exclude
+     *
+     * @ORM\OneToMany(targetEntity="User", mappedBy="currentRoom", cascade={"all"})
+     */
+    private $currentUsers;
+
     public function __construct()
     {
         $this->id = 0;
         $this->sensors = new ArrayCollection();
         $this->speakers = new ArrayCollection();
+        $this->currentUsers = new ArrayCollection();
     }
 
     /**
@@ -236,6 +248,57 @@ class Room
     {
         if($sensor) {
             return $this->getSensors()->removeElement($sensor);
+        }
+
+        return false;
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCurrentUsers()
+    {
+        return $this->currentUsers;
+    }
+
+    /**
+     * Set users
+     *
+     * @param \Doctrine\Common\Collections\Collection $currentUsers
+     * @return Room
+     */
+    public function setCurrentUsers($currentUsers)
+    {
+        $this->currentUsers = $currentUsers;
+        return $this;
+    }
+
+    /**
+     * Add user
+     *
+     * @param User $user
+     * @return boolean TRUE if the users list didn't contained the specified element, FALSE otherwise
+     */
+    public function addUser(User $user)
+    {
+        if($user && !$this->getCurrentUsers()->contains($user)) {
+            return $this->getCurrentUsers()->add($user);
+        }
+        return false;
+    }
+
+    /**
+     * Remove user
+     *
+     * @param User $user
+     * @return boolean TRUE if the users list contained the specified element, FALSE otherwise.
+     */
+    public function removeUser(User $user)
+    {
+        if($user) {
+            return $this->getCurrentUsers()->removeElement($user);
         }
 
         return false;
