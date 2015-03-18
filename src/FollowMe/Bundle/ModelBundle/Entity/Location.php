@@ -39,7 +39,7 @@ class Location
      * @Since("0.1")
      * @Groups({"all", "list", "info"})
      *
-     * @ORM\Column(name="artist", type="datetime")
+     * @ORM\Column(name="date", type="datetime")
      */
     private $date;
 
