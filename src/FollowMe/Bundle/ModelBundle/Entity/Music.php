@@ -32,6 +32,16 @@ class Music
     private $id;
 
     /**
+     * @var string
+     *
+     * @Since("0.1")
+     * @Groups({"all", "list", "info"})
+     *
+     * @ORM\Column(name="name", type="string", length=255)
+     */
+    private $name;
+
+    /**
      * Author of the music
      *
      * @var string
@@ -110,5 +120,23 @@ class Music
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return Music
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
     }
 }
