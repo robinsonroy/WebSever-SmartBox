@@ -67,7 +67,7 @@ class MusicController extends SuperController
      *)
      *
      */
-    public function geMusicAction($id)
+    public function getMusicAction($id)
     {
         /** @var Music $music */
         $music = $this->getMusicRepository()->find($id);
