@@ -158,7 +158,7 @@ class MusicController extends SuperController
             if($user && $music)
             {
                 // TCP Message
-                $notif = new TCPNewMusicNotification($user);
+                $notif = new TCPNewMusicNotification($music, $user);
                 $notif->send();
 
                 // Update user

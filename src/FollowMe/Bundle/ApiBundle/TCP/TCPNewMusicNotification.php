@@ -9,12 +9,44 @@
 namespace FollowMe\Bundle\ApiBundle\TCP;
 
 
+use FollowMe\Bundle\ModelBundle\Entity\Music;
+use FollowMe\Bundle\ModelBundle\Entity\User;
+
 class TCPNewMusicNotification extends TCPNotification {
 
-    private static $MESSAGE = "play";
+    /**
+     * @var Music
+     */
+    private $music;
 
-    public function getMessage()
-    {
-        return self::$MESSAGE;
+    /**
+     * @param Music $music
+     * @param User $user
+     */
+    public function __construct(Music $music, User $user) {
+        parent::__construct($user);
+        $this->setMusic($music);
     }
+
+    /**
+     * @return Music
+     */
+    public function getMusic()
+    {
+        return $this->music;
+    }
+
+    /**
+     * @param Music $music
+     */
+    public function setMusic(Music $music)
+    {
+        $this->music = $music;
+        if($music) {
+            $this->setMessage("play:".$music->getId());
+        }
+    }
+
+
+
 }
