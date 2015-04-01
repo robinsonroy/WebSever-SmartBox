@@ -4,6 +4,8 @@ namespace FollowMe\Bundle\ApiBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
+use FollowMe\Bundle\ApiBundle\TCP\TCPControlMusicNotification;
+use FollowMe\Bundle\ApiBundle\TCP\TCPNewMusicNotification;
 use FollowMe\Bundle\ModelBundle\Entity\Music;
 use FollowMe\Bundle\ModelBundle\Entity\User;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -155,7 +157,9 @@ class MusicController extends SuperController
             // Valid
             if($user && $music)
             {
-                //TODO: TCP call to JAVA server
+                // TCP Message
+                $notif = new TCPNewMusicNotification($user);
+                $notif->send();
 
                 // Update user
                 $user->setCurrentlyPlayedMusic($music);
@@ -240,13 +244,17 @@ class MusicController extends SuperController
                 // Is playing ?
                 if($user->isIsPlayingMusic()) {
                     // Pause music
-                    //TODO: TCP call to JAVA server
+                    $notif = new TCPControlMusicNotification($user, TCPControlMusicNotification::PAUSE_MESSAGE);
+                    $notif->send();
+
                     $user->setIsPlayingMusic(false);
                     $response_message = 'Now playing music';
                 }
                 else {
                     // Play music
-                    //TODO: TCP call to JAVA server
+                    $notif = new TCPControlMusicNotification($user, TCPControlMusicNotification::PLAY_MESSAGE);
+                    $notif->send();
+
                     $user->setIsPlayingMusic(true);
                     $response_message = 'Music has been paused';
                 }
