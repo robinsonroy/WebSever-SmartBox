@@ -88,7 +88,7 @@ class User
      * @Since("0.1")
      * @Groups({"all"})
      *
-     * @ORM\OneToOne(targetEntity="Music")
+     * @ORM\ManyToOne(targetEntity="Music")
      */
     private $currentlyPlayedMusic;
 

@@ -161,22 +161,23 @@ class MusicController extends SuperController
                 $notif = new TCPNewMusicNotification($music, $user);
                 $notif->send();
 
-                // Update user
-                $user->setCurrentlyPlayedMusic($music);
-                $user->setIsPlayingMusic(true);
-
                 // Save
                 try {
                     $em->flush($user);
 
+                    // Update user
+                    $user->setCurrentlyPlayedMusic($music);
+                    $user->setIsPlayingMusic(true);
+
+                    // OK
                     $response_message = 'Now playing music';
                     $success = true;
                 }
                 catch(\PDOException $e) {
-                    $response_message = 'An error occurred - Code 1';
+                    $response_message = 'Code 1 : '.$e->getMessage();
                 }
                 catch(DBALException $e) {
-                    $response_message = 'An error occurred - Code 2';
+                    $response_message = 'Code 2 : '.$e->getMessage();
                 }
             }
 

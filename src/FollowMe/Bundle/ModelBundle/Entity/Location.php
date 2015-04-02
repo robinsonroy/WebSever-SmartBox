@@ -49,7 +49,7 @@ class Location
      * @Since("0.1")
      * @Groups({"all", "list", "info"})
      *
-     * @ORM\OneToOne(targetEntity="RFSensor")
+     * @ORM\ManyToOne(targetEntity="RFSensor")
      */
     private $sensor;
 
