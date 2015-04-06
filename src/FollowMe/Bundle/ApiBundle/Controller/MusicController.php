@@ -6,6 +6,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use FollowMe\Bundle\ApiBundle\TCP\TCPControlMusicNotification;
 use FollowMe\Bundle\ApiBundle\TCP\TCPNewMusicNotification;
+use FollowMe\Bundle\ApiBundle\TCP\TCPVolumeMusicNotification;
 use FollowMe\Bundle\ModelBundle\Entity\Music;
 use FollowMe\Bundle\ModelBundle\Entity\User;
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -201,6 +202,82 @@ class MusicController extends SuperController
         );
 
     }
+
+    /**
+     * Update volume
+     *
+     * @FosView
+     *
+     * @param integer $userId
+     * @param integer|string $volume
+     *
+     * @return View
+     *
+     * @Get("/music/volume/{userId}/{volume}")
+     *
+     * @ApiDoc(
+     *  resource=true,
+     *  description="Change volume",
+     *  section="Music",
+     *  statusCodes={
+     *      200="Returned when successful"
+     *  },
+     *  tags={
+     *      "dev"
+     *  }
+     *)
+     *
+     */
+    public function getMusicVolume($userId, $volume)
+    {
+        if(!is_numeric($userId) && (is_numeric($volume) || ($volume == '+' || $volume == '-') ) ) {
+            throw $this->createNotFoundException();
+        }
+
+        $success = false;
+        $response_message = null;
+
+        /** @var User $user */
+        $user = $this->getUserRepository()->find($userId);
+        if (!$user)
+            $response_message = "User doesn't exist";
+        else if(is_numeric($volume) && ($volume < 0 || $volume > 100)) {
+            $response_message = "Invalid volume parameter";
+        }
+        else {
+
+            $notif = null;
+
+            if($volume == '+') {
+                $notif = new TCPControlMusicNotification($user, TCPVolumeMusicNotification::UP);
+            }
+            else if($volume == '-') {
+                $notif = new TCPControlMusicNotification($user, TCPVolumeMusicNotification::DOWN);
+            }
+            else {
+                $notif = new TCPControlMusicNotification($user, TCPVolumeMusicNotification::ABSOLUTE, $volume);
+            }
+
+            $notif->send();
+            $response_message = 'Volume updated';
+            $success = true;
+        }
+
+        // Generate response
+        $statusCode = $success ? SuperController::OK : SuperController::ERROR;
+
+        $data = array(
+            'success' => $success,
+            'message' => $response_message
+        );
+
+        return $this->createViewWithData(
+            $data,
+            array('info'),
+            $statusCode
+        );
+    }
+
     /**
      * @FosView
      *
