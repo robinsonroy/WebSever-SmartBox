@@ -14,6 +14,7 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\View as FosView;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\HttpFoundation\Request;
 
 class MusicController extends SuperController
@@ -160,10 +161,13 @@ class MusicController extends SuperController
             {
                 // TCP Message
                 $notif = new TCPNewMusicNotification($music, $user);
-                $notif->send();
 
                 // Save
                 try {
+                    // Send
+                    $notif->send();
+
+                    // Save
                     $em->flush($user);
 
                     // Update user
@@ -173,6 +177,9 @@ class MusicController extends SuperController
                     // OK
                     $response_message = 'Now playing music';
                     $success = true;
+                }
+                catch(ContextErrorException $e) {
+                    $response_message = 'Could not send request to the speakers';
                 }
                 catch(\PDOException $e) {
                     $response_message = 'Code 1 : '.$e->getMessage();
@@ -228,9 +235,9 @@ class MusicController extends SuperController
      *)
      *
      */
-    public function getMusicVolume($userId, $volume)
+    public function getMusicVolumeAction($userId, $volume)
     {
-        if(!is_numeric($userId) && (is_numeric($volume) || ($volume == '+' || $volume == '-') ) ) {
+        if(!is_numeric($userId) || !(is_numeric($volume) || ($volume == '+' || $volume == '-') ) ) {
             throw $this->createNotFoundException();
         }
 
@@ -249,18 +256,24 @@ class MusicController extends SuperController
             $notif = null;
 
             if($volume == '+') {
-                $notif = new TCPControlMusicNotification($user, TCPVolumeMusicNotification::UP);
+                $notif = new TCPVolumeMusicNotification($user, TCPVolumeMusicNotification::UP);
             }
             else if($volume == '-') {
-                $notif = new TCPControlMusicNotification($user, TCPVolumeMusicNotification::DOWN);
+                $notif = new TCPVolumeMusicNotification($user, TCPVolumeMusicNotification::DOWN);
             }
             else {
-                $notif = new TCPControlMusicNotification($user, TCPVolumeMusicNotification::ABSOLUTE, $volume);
+                $notif = new TCPVolumeMusicNotification($user, TCPVolumeMusicNotification::ABSOLUTE, $volume);
             }
 
-            $notif->send();
-            $response_message = 'Volume updated';
-            $success = true;
+            try {
+                $notif->send();
+                $response_message = 'Volume updated';
+                $success = true;
+            }
+            catch(ContextErrorException $e) {
+                $response_message = 'Could not send request to the speakers';
+            }
+
         }
 
         // Generate response
@@ -323,23 +336,26 @@ class MusicController extends SuperController
                 if($user->isIsPlayingMusic()) {
                     // Pause music
                     $notif = new TCPControlMusicNotification($user, TCPControlMusicNotification::PAUSE_MESSAGE);
-                    $notif->send();
 
                     $user->setIsPlayingMusic(false);
-                    $response_message = 'Now playing music';
+                    $response_message = 'Music has been paused';
                 }
                 else {
                     // Play music
                     $notif = new TCPControlMusicNotification($user, TCPControlMusicNotification::PLAY_MESSAGE);
-                    $notif->send();
 
                     $user->setIsPlayingMusic(true);
-                    $response_message = 'Music has been paused';
+                    $response_message = 'Now playing music';
                 }
 
                 try {
+                    $notif->send();
+
                     $em->flush($user);
                     $success = true;
+                }
+                catch(ContextErrorException $e) {
+                    $response_message = 'Could not send request to the speakers';
                 }
                 catch(\PDOException $e) {
                     $response_message = 'An error occurred - Code 1';
